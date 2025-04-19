@@ -53,3 +53,4 @@ __pycache__/
 # Local data that shouldn't be committed
 .data/
 .cache/
+node_modules
