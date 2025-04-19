@@ -1,0 +1,780 @@
+{
+  "targets": [
+    "co2_pc",
+    "forest_land_EFProdPerCap"
+  ],
+  "clusters": [
+    {
+      "iso3": "ABW",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "AFG",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "AGO",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ALB",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ARE",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "ARG",
+      "cluster_lvl2": 0.0
+    },
+    {
+      "iso3": "ARM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ATG",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "AUS",
+      "cluster_lvl2": 0.0
+    },
+    {
+      "iso3": "AUT",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "AZE",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BDI",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BEL",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "BEN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BFA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BGD",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BGR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BHR",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "BHS",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BIH",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BLR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BLZ",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BMU",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BOL",
+      "cluster_lvl2": 0.0
+    },
+    {
+      "iso3": "BRA",
+      "cluster_lvl2": 3.0
+    },
+    {
+      "iso3": "BRB",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BRN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BTN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "BWA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CAF",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CAN",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "CHE",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CHL",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CHN",
+      "cluster_lvl2": NaN
+    },
+    {
+      "iso3": "CIV",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CMR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "COD",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "COG",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "COK",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "COL",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "COM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CPV",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CRI",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CSHH",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CUB",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CYM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CYP",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "CZE",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "DEU",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "DJI",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "DMA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "DNK",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "DOM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "DZA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ECU",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "EGY",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ERI",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ESP",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "EST",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "ETH",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "FIN",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "FJI",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "FRA",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "FSM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GAB",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GBR",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "GEO",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GHA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GIN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GLP",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GMB",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GNB",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GNQ",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GRC",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GRD",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GTM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "GUF",
+      "cluster_lvl2": 0.0
+    },
+    {
+      "iso3": "GUY",
+      "cluster_lvl2": 0.0
+    },
+    {
+      "iso3": "HND",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "HRV",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "HTI",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "HUN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "IDN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "IND",
+      "cluster_lvl2": NaN
+    },
+    {
+      "iso3": "IRL",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "IRN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "IRQ",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ISR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ITA",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "JAM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "JOR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "JPN",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "KAZ",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "KEN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "KGZ",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "KHM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "KIR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "KOR",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "KWT",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "LAO",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "LBN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "LBR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "LBY",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "LCA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "LKA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "LSO",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "LTU",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "LUX",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "LVA",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "MAR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MDA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MDG",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MEX",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MKD",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MLI",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MLT",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MMR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MNE",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MNG",
+      "cluster_lvl2": 0.0
+    },
+    {
+      "iso3": "MOZ",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MRT",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MSR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MTQ",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MUS",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MWI",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "MYS",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "NAM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "NER",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "NGA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "NIC",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "NLD",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "NOR",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "NPL",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "NZL",
+      "cluster_lvl2": 0.0
+    },
+    {
+      "iso3": "OMN",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "PAK",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "PAN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "PER",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "PHL",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "PNG",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "POL",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "PRK",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "PRT",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "PRY",
+      "cluster_lvl2": 0.0
+    },
+    {
+      "iso3": "PYF",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "QAT",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "REU",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ROU",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "RUS",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "RWA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SAU",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SCG",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SDN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SEN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SGP",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "SLE",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SLV",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SOM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SRB",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SSD",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "STP",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SUR",
+      "cluster_lvl2": 0.0
+    },
+    {
+      "iso3": "SUUH",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SVK",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "SVN",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "SWE",
+      "cluster_lvl2": 1.0
+    },
+    {
+      "iso3": "SWZ",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "SYR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "TCD",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "TGO",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "THA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "TJK",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "TKM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "TLS",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "TON",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "TTO",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "TUN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "TUR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "TZA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "UGA",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "UKR",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "URY",
+      "cluster_lvl2": 0.0
+    },
+    {
+      "iso3": "USA",
+      "cluster_lvl2": NaN
+    },
+    {
+      "iso3": "UZB",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "VEN",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "VNM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "VUT",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "WSM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "YEM",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "YUG",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ZAF",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ZMB",
+      "cluster_lvl2": 2.0
+    },
+    {
+      "iso3": "ZWE",
+      "cluster_lvl2": 2.0
+    }
+  ]
+}

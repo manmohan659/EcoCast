@@ -1,0 +1,33 @@
+{
+  "dropped_gdp_variants": [
+    "d_Percapita GDP (2010 USD)_EFImportsTotGHA",
+    "Percapita GDP (2010 USD)_EFImportsTotGHA_lag1",
+    "Percapita GDP (2010 USD)_EFExportsPerCap_lag1",
+    "d_Percapita GDP (2010 USD)_BiocapTotGHA",
+    "Percapita GDP (2010 USD)_EFConsTotGHA",
+    "Percapita GDP (2010 USD)_BiocapTotGHA_lag1",
+    "Percapita GDP (2010 USD)_BiocapTotGHA",
+    "d_Percapita GDP (2010 USD)_EFExportsTotGHA",
+    "Percapita GDP (2010 USD)_EFImportsTotGHA",
+    "Percapita GDP (2010 USD)_EFExportsTotGHA_lag1",
+    "d_Percapita GDP (2010 USD)_EFProdTotGHA",
+    "Percapita GDP (2010 USD)_EFProdPerCap",
+    "Percapita GDP (2010 USD)_EFProdTotGHA",
+    "Percapita GDP (2010 USD)_EFImportsPerCap_lag1",
+    "Percapita GDP (2010 USD)_BiocapPerCap_lag1",
+    "Percapita GDP (2010 USD)_EFConsPerCap",
+    "d_Percapita GDP (2010 USD)_EFConsTotGHA",
+    "Percapita GDP (2010 USD)_EFConsPerCap_lag1",
+    "d_Percapita GDP (2010 USD)_EFImportsPerCap",
+    "d_Percapita GDP (2010 USD)_EFConsPerCap",
+    "Percapita GDP (2010 USD)_EFProdTotGHA_lag1",
+    "d_Percapita GDP (2010 USD)_EFProdPerCap",
+    "Percapita GDP (2010 USD)_EFExportsPerCap",
+    "d_Percapita GDP (2010 USD)_BiocapPerCap",
+    "Percapita GDP (2010 USD)_EFImportsPerCap",
+    "Percapita GDP (2010 USD)_EFConsTotGHA_lag1",
+    "d_Percapita GDP (2010 USD)_EFExportsPerCap",
+    "Percapita GDP (2010 USD)_EFExportsTotGHA",
+    "Percapita GDP (2010 USD)_EFProdPerCap_lag1"
+  ]
+}

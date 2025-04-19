@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "@agentdeskai/browser-tools-server": "^1.2.1"
+  },
+  "dependencies": {
+    "@visx/group": "^3.12.0",
+    "@visx/mock-data": "^3.12.0",
+    "@visx/stats": "^3.12.0"
+  }
+}
