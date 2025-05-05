@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate, createSearchParams } from "react-router-dom";
 import axios from "axios";
+import * as d3 from "d3";
 import { 
   XYChart, 
   AnimatedAxis, 
   AnimatedGrid,
   AnimatedLineSeries, 
-  AnimatedPointSeries,
+  AnimatedGlyphSeries, // Using this instead of AnimatedPointSeries
   AnimatedBarSeries,
   AnimatedBarGroup,
   Tooltip,
-  ReferenceArea,
-  ReferenceLine,
   Annotation
 } from "@visx/xychart";
+// These need separate imports
+import { ReferenceLine } from "@visx/annotation";
+import { RectClipPath } from "@visx/clip-path";
 import { BoxPlot } from '@visx/stats';
 import { curveMonotoneX } from 'd3-shape';
 import { scaleLinear, scaleOrdinal } from '@visx/scale';
@@ -61,7 +63,7 @@ const ComparisonViewHeader: React.FC<{
             className="flex items-center bg-zinc-800 rounded-full pl-2 pr-1 py-1"
           >
             <img
-              src={`https://flagcdn.com/w20/${country.toLowerCase().slice(0, 2)}.png`}
+              src={`https://flagcdn.com/w20/${country && typeof country === 'string' ? country.toLowerCase().slice(0, 2) : 'xx'}.png`}
               alt={`${country} flag`}
               className="w-5 h-3.5 mr-2"
               onError={(e) => {
@@ -139,7 +141,10 @@ const InsightComparisonView: React.FC = () => {
     const questionParam = searchParams.get('question');
 
     if (countriesParam) {
-      setCountries(countriesParam.split(','));
+      // Normalize country codes to uppercase for consistency
+      const normalizedCountries = countriesParam.split(',').map(code => code.toUpperCase());
+      console.log(`[InsightComparisonView] Normalized country codes from URL: ${normalizedCountries.join(', ')}`);
+      setCountries(normalizedCountries);
     }
 
     if (questionParam) {
@@ -161,53 +166,95 @@ const InsightComparisonView: React.FC = () => {
       try {
         console.log(`[InsightComparisonView] Fetching data for question: ${question}`);
         
-        // Add special handling for resource_curse
+        // Special handling for resource_curse
         if (question === 'resource_curse') {
           console.log('[InsightComparisonView] Handling Resource Curse visualization specifically');
-        }
-        
-        // Fetch data for the selected insight
-        try {
-          const response = await axios.get(`/insights/${question}/${question}.csv`);
-          console.log(`[InsightComparisonView] Data fetched successfully for ${question}`);
-
-          if (response.data) {
-            // Parse CSV data (this is a simple parser, could be improved)
-            const lines = response.data.split('\n');
-            const headers = lines[0].split(',');
+          try {
+            console.time('resourceCurseDataFetch');
+            console.log('[InsightComparisonView] Starting fetch for resource_curse.csv...');
             
-            const parsedData = lines.slice(1).filter(line => line.trim()).map((line: string) => {
-              const values = line.split(',');
-              const entry: Record<string, any> = {};
+            // Use d3.csv with a performance-optimized approach
+            const response = await fetch(`/insights/resource_curse/resource_curse.csv`);
+            
+            // Only process the response if status is OK
+            if (!response.ok) {
+              console.error(`[InsightComparisonView] Failed to fetch resource curse data: ${response.status}`);
+              throw new Error(`Failed to fetch resource curse data: ${response.status}`);
+            }
+            
+            console.log(`[InsightComparisonView] Fetch successful, status: ${response.status}`);
+            const csvText = await response.text();
+            console.log(`[InsightComparisonView] CSV text length: ${csvText.length} bytes`);
+            console.log(`[InsightComparisonView] First 100 chars of CSV: ${csvText.substring(0, 100)}`);
+            
+            // Use a Set for faster lookups during deduplication
+            const seenIso3 = new Set();
+            const parsedData = d3.csvParse(csvText, d => {
+              // Log the first few rows to debug
+              if (seenIso3.size < 3) {
+                console.log('[InsightComparisonView] CSV row sample:', d);
+              }
               
-              headers.forEach((header: string, index: number) => {
-                // Try to convert to number if possible
-                const value = values[index];
-                entry[header] = isNaN(Number(value)) ? value : Number(value);
-              });
+              // Skip this row if we've already seen this ISO3 code
+              if (seenIso3.has(d.iso3)) {
+                return null; // d3.csvParse will filter out null returns
+              }
               
-              return entry;
+              // Mark this ISO3 as seen
+              seenIso3.add(d.iso3);
+              
+              return {
+                iso3: d.iso3,
+                rent: +d.rent_pct_gdp, // Convert to number
+                hdi: +d.hdi // Convert to number
+              };
             });
             
-            // Remove duplicates (mentioned in the requirements)
-            if (question === 'resource_curse') {
-              const uniqueData = parsedData.reduce((acc: any[], current: any) => {
-                const isDuplicate = acc.some(item => item.iso3 === current.iso3);
-                if (!isDuplicate) {
-                  acc.push(current);
-                }
-                return acc;
-              }, []);
+            console.log(`[InsightComparisonView] Resource curse data processed: ${parsedData.length} unique entries`);
+            console.log(`[InsightComparisonView] First few entries:`, parsedData.slice(0, 3));
+            
+            // Log the selected countries to see if they're in the data
+            console.log(`[InsightComparisonView] Currently selected countries: ${countries.join(', ')}`);
+            const matchingCountries = parsedData.filter(d => countries.includes(d.iso3));
+            console.log(`[InsightComparisonView] Matching countries found in data: ${matchingCountries.length}`);
+            matchingCountries.forEach(c => console.log(`Found: ${c.iso3}, rent: ${c.rent}, hdi: ${c.hdi}`));
+            
+            setInsightData(parsedData);
+            console.timeEnd('resourceCurseDataFetch');
+          } catch (error) {
+            console.error(`[InsightComparisonView] Error fetching resource curse data:`, error);
+            setError(`Failed to load data for Resource Curse. Please check that the backend server is running.`);
+          }
+        } else {
+          // Fetch data for other insights
+          try {
+            const response = await axios.get(`/insights/${question}/${question}.csv`);
+            console.log(`[InsightComparisonView] Data fetched successfully for ${question}`);
+
+            if (response.data) {
+              // Parse CSV data (this is a simple parser, could be improved)
+              const lines = response.data.split('\n');
+              const headers = lines[0].split(',');
               
-              console.log(`[InsightComparisonView] Removed duplicates: ${parsedData.length} -> ${uniqueData.length} entries`);
-              setInsightData(uniqueData);
-            } else {
+              const parsedData = lines.slice(1).filter(line => line.trim()).map((line: string) => {
+                const values = line.split(',');
+                const entry: Record<string, any> = {};
+                
+                headers.forEach((header: string, index: number) => {
+                  // Try to convert to number if possible
+                  const value = values[index];
+                  entry[header] = isNaN(Number(value)) ? value : Number(value);
+                });
+                
+                return entry;
+              });
+              
               setInsightData(parsedData);
             }
+          } catch (error) {
+            console.error(`[InsightComparisonView] Error fetching data from API:`, error);
+            setError(`Failed to load data for ${question}. Please check that the backend server is running.`);
           }
-        } catch (error) {
-          console.error(`[InsightComparisonView] Error fetching data from API:`, error);
-          setError(`Failed to load data for ${question}. Please check that the backend server is running.`);
         }
 
         // If the question is about narratives, fetch that data too
@@ -260,7 +307,7 @@ const InsightComparisonView: React.FC = () => {
     } else {
       // Update the URL with the new countries list
       navigate({
-        pathname: '/compare',
+        pathname: '/insight',
         search: createSearchParams({
           countries: newCountries.join(','),
           question: question
@@ -269,20 +316,53 @@ const InsightComparisonView: React.FC = () => {
       setCountries(newCountries);
     }
   };
+  
+  // Ensure we don't exceed 4 countries (for performance and readability)
+  useEffect(() => {
+    if (countries.length > 4) {
+      console.log('[InsightComparisonView] Limiting basket to 4 countries for performance');
+      // Show toast or message to user
+      alert('For best visualization experience, only the first 4 countries will be shown.');
+      // Update URL with only first 4 countries
+      navigate({
+        pathname: '/insight',
+        search: createSearchParams({
+          countries: countries.slice(0, 4).join(','),
+          question: question
+        }).toString()
+      });
+      // Update state
+      setCountries(countries.slice(0, 4));
+    }
+  }, [countries]);
 
   // Filter insight data to only include selected countries
   const getFilteredData = () => {
-    if (!insightData.length) return [];
+    console.log(`[InsightComparisonView] getFilteredData() called. Data length: ${insightData.length}, countries: ${countries.join(', ')}`);
+    
+    if (!insightData.length) {
+      console.log('[InsightComparisonView] No insight data available');
+      return [];
+    }
     
     if (showGlobalContext) {
       // If showing global context, return all data but mark selected countries
-      return insightData.map(item => ({
+      const result = insightData.map(item => ({
         ...item,
         isSelected: countries.includes(item.iso3)
       }));
+      console.log(`[InsightComparisonView] Returning all ${result.length} entries with isSelected flag`);
+      return result;
     } else {
       // Otherwise, filter to only selected countries
-      return insightData.filter(item => countries.includes(item.iso3));
+      const result = insightData.filter(item => countries.includes(item.iso3));
+      console.log(`[InsightComparisonView] Filtered to ${result.length} entries for selected countries`);
+      if (result.length === 0) {
+        console.log('[InsightComparisonView] Warning: No data matches the selected countries!');
+        console.log(`[InsightComparisonView] Selected countries: ${countries.join(', ')}`);
+        console.log(`[InsightComparisonView] Available countries in data: ${insightData.slice(0, 10).map(d => d.iso3).join(', ')}${insightData.length > 10 ? '...' : ''}`);
+      }
+      return result;
     }
   };
 
@@ -331,14 +411,75 @@ const InsightComparisonView: React.FC = () => {
 
     if (filteredData.length === 0) {
       return (
-        <div className="flex items-center justify-center h-96 bg-zinc-800 rounded-md">
-          <div className="text-white">No data available for the selected countries.</div>
+        <div className="flex flex-col items-center justify-center h-96 bg-zinc-800 rounded-md">
+          <div className="text-white text-xl mb-4">No data available for the selected countries.</div>
+          <div className="text-zinc-400 text-sm mb-4">
+            This could be because the selected countries don't have data in our dataset.
+          </div>
+          <button
+            onClick={() => {
+              // If we have data but no matches, suggest some countries that have data
+              if (insightData.length > 0) {
+                // Make sure we have valid iso3 codes
+                const validEntries = insightData.filter(d => d && d.iso3 && typeof d.iso3 === 'string');
+                
+                // Select first 3 valid countries (or fewer if not enough)
+                const count = Math.min(3, validEntries.length);
+                const suggestedCountries = validEntries.slice(0, count).map(d => d.iso3.toUpperCase());
+                
+                console.log(`[InsightComparisonView] Found ${validEntries.length} valid countries in data`);
+                console.log(`[InsightComparisonView] Suggesting countries: ${suggestedCountries.join(', ')}`);
+                
+                if (suggestedCountries.length > 0) {
+                  // Update the URL with the suggested countries
+                  navigate({
+                    pathname: '/insight',
+                    search: createSearchParams({
+                      countries: suggestedCountries.join(','),
+                      question: question
+                    }).toString()
+                  });
+                  
+                  // Update state
+                  setCountries(suggestedCountries);
+                } else {
+                  alert('No valid country data found. Please try a different insight question.');
+                }
+              } else {
+                alert('No data available. Please check if the backend is running.');
+              }
+            }}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Try with available countries
+          </button>
         </div>
       );
     }
 
     // Resource Curse visualization (scatter plot)
     if (question === 'resource_curse') {
+      // Calculate median HDI for the global dataset
+      const medianHDI = d3.median(filteredData, d => d.hdi) || 0.7;
+      
+      // Separate basket countries from the rest of the world
+      const basketIso3 = countries;
+      const basket = filteredData.filter(d => basketIso3.includes(d.iso3));
+      const world = filteredData.filter(d => !basketIso3.includes(d.iso3));
+      
+      // Edge case: no countries selected
+      if (basket.length === 0) {
+        return (
+          <div className="bg-zinc-800 p-4 rounded-md flex flex-col items-center justify-center h-96">
+            <div className="text-white text-lg">Pick at least one country to see where it lands.</div>
+            <div className="mt-4 text-zinc-400 text-sm max-w-md text-center">
+              The resource curse visualization will show where your selected countries 
+              fall in relation to resource rents and human development.
+            </div>
+          </div>
+        );
+      }
+      
       return (
         <div className="bg-zinc-800 p-4 rounded-md">
           <div className="flex justify-between items-center mb-4">
@@ -352,22 +493,22 @@ const InsightComparisonView: React.FC = () => {
                     : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
                 }`}
               >
-                {showGlobalContext ? 'Hide Global Context' : 'Show Global Context'}
+                {showGlobalContext ? 'Micro (Basket Only)' : 'Macro (World Context)'}
               </button>
             </div>
           </div>
           
           <div className="h-96">
             <XYChart
-              height={350}
-              xScale={{ type: 'linear', domain: [0, Math.max(...filteredData.map(d => d.rent_pct_gdp)) * 1.1] }}
+              height={450}
+              xScale={{ type: 'linear', domain: [0, Math.max(...filteredData.map(d => d.rent)) * 1.1] }}
               yScale={{ type: 'linear', domain: [0, 1] }}
               margin={{ top: 20, right: 40, bottom: 50, left: 60 }}
             >
               <AnimatedGrid columns={false} numTicks={5} />
               <AnimatedAxis 
                 orientation="bottom" 
-                label="Natural Resource Rents (% of GDP)"
+                label="% of GDP from resource rents"
                 labelOffset={40}
                 labelProps={{
                   fill: 'white',
@@ -383,7 +524,7 @@ const InsightComparisonView: React.FC = () => {
               />
               <AnimatedAxis 
                 orientation="left" 
-                label="Human Development Index" 
+                label="Human-Development Index" 
                 labelOffset={50}
                 labelProps={{
                   fill: 'white',
@@ -398,75 +539,112 @@ const InsightComparisonView: React.FC = () => {
                 numTicks={5}
               />
               
-              {/* Reference areas for visualization */}
-              <ReferenceArea
-                x1={10}
-                x2={100}
-                y1={0}
-                y2={0.7}
-                label="Resource curse zone"
-                labelFill="white"
-                labelFontSize={12}
-                fillOpacity={0.1}
-                fill="#f43f5e"
-              />
-              
-              {/* Points for each country */}
-              <AnimatedPointSeries
-                dataKey="countries"
-                data={filteredData}
-                xAccessor={(d) => d.rent_pct_gdp}
-                yAccessor={(d) => d.hdi}
-                colorAccessor={(d) => showGlobalContext 
-                  ? (d.isSelected ? colorScale(d.iso3) : 'rgba(255,255,255,0.2)')
-                  : colorScale(d.iso3)
-                }
-                sizeAccessor={() => showGlobalContext ? (d: any) => d.isSelected ? 8 : 4 : 8}
-              />
-              
-              {/* Annotations for selected countries */}
-              {!showGlobalContext && filteredData.map((country) => (
-                <Annotation
-                  key={country.iso3}
-                  dataKey={`${country.iso3}-label`}
-                  datum={{ x: country.rent_pct_gdp, y: country.hdi }}
-                  dx={5}
-                  dy={-5}
+              {/* Curse zone - lower right quadrant */}
+              <Group>
+                <rect
+                  x={10}
+                  y={0}
+                  width={Math.max(...filteredData.map(d => d.rent)) * 1.1 - 10}
+                  height={medianHDI}
+                  fill="#f43f5e"
+                  fillOpacity={0.08}
+                />
+                <text
+                  x={Math.max(...filteredData.map(d => d.rent)) * 0.6}
+                  y={medianHDI / 2}
+                  fill="white"
+                  fontSize={12}
+                  textAnchor="middle"
                 >
-                  <text
-                    fill={colorScale(country.iso3)}
-                    fontSize={10}
-                    fontWeight="bold"
-                    textAnchor="start"
+                  'Curse' zone
+                </text>
+              </Group>
+              
+              {/* Global median HDI line */}
+              <Group>
+                <line
+                  x1={0}
+                  x2={Math.max(...filteredData.map(d => d.rent)) * 1.1}
+                  y1={medianHDI}
+                  y2={medianHDI}
+                  stroke="#94a3b8"
+                  strokeDasharray="4 4"
+                />
+                <text
+                  x={Math.max(...filteredData.map(d => d.rent)) * 0.5}
+                  y={medianHDI - 10}
+                  fill="#94a3b8"
+                  fontSize={10}
+                  textAnchor="middle"
+                >
+                  Global median HDI {medianHDI.toFixed(3)}
+                </text>
+              </Group>
+              
+              {/* Pale background dots - only show when toggled */}
+              {showGlobalContext && (
+                <AnimatedGlyphSeries
+                  dataKey="world"
+                  data={world}
+                  xAccessor={(d) => d.rent}
+                  yAccessor={(d) => d.hdi}
+                  size={3}
+                  fillOpacity={0.25}
+                  fill="#e2e8f0"
+                />
+              )}
+              
+              {/* Bold dots for the user's basket */}
+              <AnimatedGlyphSeries
+                dataKey="selection"
+                data={basket}
+                xAccessor={(d) => d.rent}
+                yAccessor={(d) => d.hdi}
+                size={6}
+                fill={(d) => colorScale(d.iso3)}
+              />
+              
+              {/* Country labels for selected countries */}
+              {basket.map((country) => {
+                // Skip invalid countries
+                if (!country || !country.iso3) return null;
+                
+                return (
+                  <Annotation
+                    key={`annotation-${country.iso3}`}
+                    dataKey={`${country.iso3}-label`}
+                    datum={{ x: country.rent, y: country.hdi }}
+                    dx={5}
+                    dy={-5}
                   >
-                    {country.iso3}
-                  </text>
-                </Annotation>
-              ))}
+                    <text
+                      key={`text-${country.iso3}`}
+                      fill={colorScale(country.iso3)}
+                      fontSize={10}
+                      fontWeight="bold"
+                      textAnchor="start"
+                    >
+                      {country.iso3}
+                    </text>
+                  </Annotation>
+                );
+              })}
               
               <Tooltip
                 snapTooltipToDatumX
                 snapTooltipToDatumY
-                showVerticalCrosshair
-                showHorizontalCrosshair
                 renderTooltip={({ tooltipData }) => {
                   if (!tooltipData || !tooltipData.nearestDatum) return null;
                   const datum = tooltipData.nearestDatum.datum as any;
                   
                   return (
-                    <div className="bg-zinc-900 p-3 rounded-lg shadow-xl border border-zinc-700">
-                      <div className="text-white font-bold">
-                        {countryNames[datum.iso3] || datum.iso3}
-                      </div>
-                      <div className="text-zinc-300 text-sm mt-1">
-                        HDI: {datum.hdi.toFixed(3)}
-                      </div>
-                      <div className="text-zinc-300 text-sm">
-                        Resource Rents: {datum.rent_pct_gdp.toFixed(1)}% of GDP
-                      </div>
-                      {datum.rent_pct_gdp > 10 && datum.hdi < 0.7 && (
-                        <div className="text-red-400 text-sm mt-1">
-                          ⚠️ Possible resource curse
+                    <div className="text-sm">
+                      <b>{datum.iso3}</b><br/>
+                      Rents: {datum.rent.toFixed(1)} % <br/>
+                      HDI: {datum.hdi.toFixed(3)}
+                      {datum.rent > 10 && datum.hdi < medianHDI && (
+                        <div className="text-red-400 font-medium mt-1">
+                          ⚠️ In 'curse' zone
                         </div>
                       )}
                     </div>
@@ -476,10 +654,22 @@ const InsightComparisonView: React.FC = () => {
             </XYChart>
           </div>
           
+          {/* Toggle and legend */}
+          <div className="flex items-center gap-2 mt-4">
+            <input 
+              type="checkbox" 
+              id="worldSwitch"
+              checked={showGlobalContext} 
+              onChange={e => setShowGlobalContext(e.target.checked)} 
+            />
+            <label htmlFor="worldSwitch" className="text-white text-sm">
+              Show rest of world
+            </label>
+          </div>
+          
           <div className="mt-4 text-zinc-400 text-sm">
             <p>The resource curse hypothesis suggests that countries rich in natural resources tend to have lower economic growth and worse development outcomes. 
-               This chart plots resource rents as a percentage of GDP against the Human Development Index.</p>
-            <p className="mt-2">Countries in the red zone (high resource dependence, low HDI) may be experiencing the "resource curse" phenomenon.</p>
+               Countries in the red zone (high resource dependence, low HDI) may be experiencing this phenomenon.</p>
           </div>
         </div>
       );
@@ -547,7 +737,7 @@ const InsightComparisonView: React.FC = () => {
               />
               
               {/* Points for each country */}
-              <AnimatedPointSeries
+              <AnimatedGlyphSeries
                 dataKey="countries"
                 data={filteredData}
                 xAccessor={(d) => d.delta}
@@ -556,28 +746,34 @@ const InsightComparisonView: React.FC = () => {
                   ? (d.isSelected ? colorScale(d.iso3) : 'rgba(255,255,255,0.2)')
                   : colorScale(d.iso3)
                 }
-                sizeAccessor={() => showGlobalContext ? (d: any) => d.isSelected ? 8 : 4 : 8}
+                sizeAccessor={(d) => showGlobalContext ? (d.isSelected ? 8 : 4) : 8}
               />
               
               {/* Annotations for selected countries */}
-              {!showGlobalContext && filteredData.map((country) => (
-                <Annotation
-                  key={country.iso3}
-                  dataKey={`${country.iso3}-label`}
-                  datum={{ x: country.delta, y: country.co2_pc }}
-                  dx={5}
-                  dy={-5}
-                >
-                  <text
-                    fill={colorScale(country.iso3)}
-                    fontSize={10}
-                    fontWeight="bold"
-                    textAnchor="start"
+              {!showGlobalContext && filteredData.map((country) => {
+                // Skip invalid countries
+                if (!country || !country.iso3) return null;
+                
+                return (
+                  <Annotation
+                    key={`annotation-${country.iso3}`}
+                    dataKey={`${country.iso3}-label`}
+                    datum={{ x: country.delta, y: country.co2_pc }}
+                    dx={5}
+                    dy={-5}
                   >
-                    {country.iso3}
-                  </text>
-                </Annotation>
-              ))}
+                    <text
+                      key={`text-${country.iso3}`}
+                      fill={colorScale(country.iso3)}
+                      fontSize={10}
+                      fontWeight="bold"
+                      textAnchor="start"
+                    >
+                      {country.iso3}
+                    </text>
+                  </Annotation>
+                );
+              })}
               
               <Tooltip
                 snapTooltipToDatumX
@@ -684,18 +880,29 @@ const InsightComparisonView: React.FC = () => {
               />
               
               {/* Reference line at y=0 */}
-              <ReferenceLine
-                orientation="horizontal"
-                strokeWidth={1}
-                stroke="#666"
-                strokeDasharray="4,4"
-                label="No forest change"
-                labelFill="white"
-                labelFontSize={10}
-              />
+              <Group>
+                <line
+                  x1={0}
+                  x2={Math.max(...filteredData.map(d => d.protected_pct)) * 1.1}
+                  y1={0}
+                  y2={0}
+                  stroke="#666"
+                  strokeWidth={1}
+                  strokeDasharray="4,4"
+                />
+                <text
+                  x={Math.max(...filteredData.map(d => d.protected_pct)) * 0.5}
+                  y={-5}
+                  fill="white"
+                  fontSize={10}
+                  textAnchor="middle"
+                >
+                  No forest change
+                </text>
+              </Group>
               
               {/* Points for each country */}
-              <AnimatedPointSeries
+              <AnimatedGlyphSeries
                 dataKey="countries"
                 data={filteredData}
                 xAccessor={(d) => d.protected_pct}
@@ -704,28 +911,34 @@ const InsightComparisonView: React.FC = () => {
                   ? (d.isSelected ? colorScale(d.iso3) : 'rgba(255,255,255,0.2)')
                   : colorScale(d.iso3)
                 }
-                sizeAccessor={() => showGlobalContext ? (d: any) => d.isSelected ? 8 : 4 : 8}
+                sizeAccessor={(d) => showGlobalContext ? (d.isSelected ? 8 : 4) : 8}
               />
               
               {/* Annotations for selected countries */}
-              {!showGlobalContext && filteredData.map((country) => (
-                <Annotation
-                  key={country.iso3}
-                  dataKey={`${country.iso3}-label`}
-                  datum={{ x: country.protected_pct, y: country.delta_forest }}
-                  dx={5}
-                  dy={-5}
-                >
-                  <text
-                    fill={colorScale(country.iso3)}
-                    fontSize={10}
-                    fontWeight="bold"
-                    textAnchor="start"
+              {!showGlobalContext && filteredData.map((country) => {
+                // Skip invalid countries
+                if (!country || !country.iso3) return null;
+                
+                return (
+                  <Annotation
+                    key={`annotation-${country.iso3}`}
+                    dataKey={`${country.iso3}-label`}
+                    datum={{ x: country.protected_pct, y: country.delta_forest }}
+                    dx={5}
+                    dy={-5}
                   >
-                    {country.iso3}
-                  </text>
-                </Annotation>
-              ))}
+                    <text
+                      key={`text-${country.iso3}`}
+                      fill={colorScale(country.iso3)}
+                      fontSize={10}
+                      fontWeight="bold"
+                      textAnchor="start"
+                    >
+                      {country.iso3}
+                    </text>
+                  </Annotation>
+                );
+              })}
               
               <Tooltip
                 snapTooltipToDatumX
@@ -847,31 +1060,56 @@ const InsightComparisonView: React.FC = () => {
               />
               
               {/* 45° reference line */}
-              <ReferenceLine
-                orientation="diagonal"
-                strokeWidth={1}
-                stroke="#666"
-                strokeDasharray="4,4"
-                label="1:1 ratio line"
-                labelFill="white"
-                labelFontSize={10}
-              />
+              <Group>
+                <line
+                  x1={0}
+                  x2={Math.max(
+                    Math.max(...filteredData.map(d => d.g_pop)) * 1.1,
+                    Math.max(...filteredData.map(d => d.g_built)) * 1.1
+                  )}
+                  y1={0}
+                  y2={Math.max(
+                    Math.max(...filteredData.map(d => d.g_pop)) * 1.1,
+                    Math.max(...filteredData.map(d => d.g_built)) * 1.1
+                  )}
+                  stroke="#666"
+                  strokeWidth={1}
+                  strokeDasharray="4,4"
+                />
+                <text
+                  x={Math.max(...filteredData.map(d => d.g_pop)) * 0.5}
+                  y={Math.max(...filteredData.map(d => d.g_pop)) * 0.5 - 10}
+                  fill="white"
+                  fontSize={10}
+                  textAnchor="middle"
+                >
+                  1:1 ratio line
+                </text>
+              </Group>
               
               {/* Reference area for urban sprawl */}
-              <ReferenceArea
-                x1={Math.min(0, Math.min(...filteredData.map(d => d.g_pop)) * 1.1)}
-                x2={Math.max(...filteredData.map(d => d.g_pop)) * 1.1}
-                y1={Math.min(0, Math.min(...filteredData.map(d => d.g_pop)) * 1.1)}
-                y2={Math.max(...filteredData.map(d => d.g_built)) * 1.1}
-                label="Urban sprawl zone"
-                labelFill="white"
-                labelFontSize={10}
-                fillOpacity={0.1}
-                fill="#f97316"
-              />
+              <Group>
+                <rect
+                  x={Math.min(0, Math.min(...filteredData.map(d => d.g_pop)) * 1.1)}
+                  y={Math.min(0, Math.min(...filteredData.map(d => d.g_pop)) * 1.1)}
+                  width={Math.max(...filteredData.map(d => d.g_pop)) * 1.1 - Math.min(0, Math.min(...filteredData.map(d => d.g_pop)) * 1.1)}
+                  height={Math.max(...filteredData.map(d => d.g_built)) * 1.1 - Math.min(0, Math.min(...filteredData.map(d => d.g_pop)) * 1.1)}
+                  fill="#f97316"
+                  fillOpacity={0.1}
+                />
+                <text
+                  x={(Math.min(0, Math.min(...filteredData.map(d => d.g_pop)) * 1.1) + Math.max(...filteredData.map(d => d.g_pop)) * 1.1) / 2}
+                  y={(Math.min(0, Math.min(...filteredData.map(d => d.g_pop)) * 1.1) + Math.max(...filteredData.map(d => d.g_built)) * 1.1) / 2}
+                  fill="white"
+                  fontSize={10}
+                  textAnchor="middle"
+                >
+                  Urban sprawl zone
+                </text>
+              </Group>
               
               {/* Points for each country */}
-              <AnimatedPointSeries
+              <AnimatedGlyphSeries
                 dataKey="countries"
                 data={filteredData}
                 xAccessor={(d) => d.g_pop}
@@ -880,28 +1118,34 @@ const InsightComparisonView: React.FC = () => {
                   ? (d.isSelected ? colorScale(d.iso3) : 'rgba(255,255,255,0.2)')
                   : colorScale(d.iso3)
                 }
-                sizeAccessor={() => showGlobalContext ? (d: any) => d.isSelected ? 8 : 4 : 8}
+                sizeAccessor={(d) => showGlobalContext ? (d.isSelected ? 8 : 4) : 8}
               />
               
               {/* Annotations for selected countries */}
-              {!showGlobalContext && filteredData.map((country) => (
-                <Annotation
-                  key={country.iso3}
-                  dataKey={`${country.iso3}-label`}
-                  datum={{ x: country.g_pop, y: country.g_built }}
-                  dx={5}
-                  dy={-5}
-                >
-                  <text
-                    fill={colorScale(country.iso3)}
-                    fontSize={10}
-                    fontWeight="bold"
-                    textAnchor="start"
+              {!showGlobalContext && filteredData.map((country) => {
+                // Skip invalid countries
+                if (!country || !country.iso3) return null;
+                
+                return (
+                  <Annotation
+                    key={`annotation-${country.iso3}`}
+                    dataKey={`${country.iso3}-label`}
+                    datum={{ x: country.g_pop, y: country.g_built }}
+                    dx={5}
+                    dy={-5}
                   >
-                    {country.iso3}
-                  </text>
-                </Annotation>
-              ))}
+                    <text
+                      key={`text-${country.iso3}`}
+                      fill={colorScale(country.iso3)}
+                      fontSize={10}
+                      fontWeight="bold"
+                      textAnchor="start"
+                    >
+                      {country.iso3}
+                    </text>
+                  </Annotation>
+                );
+              })}
               
               <Tooltip
                 snapTooltipToDatumX
@@ -1022,15 +1266,26 @@ const InsightComparisonView: React.FC = () => {
                 />
                 
                 {/* Reference line at y=0 */}
-                <ReferenceLine
-                  orientation="horizontal"
-                  strokeWidth={1}
-                  stroke="#666"
-                  strokeDasharray="4,4"
-                  label="No change"
-                  labelFill="white"
-                  labelFontSize={10}
-                />
+                <Group>
+                  <line
+                    x1={0}
+                    x2={500}
+                    y1={0}
+                    y2={0}
+                    stroke="#666"
+                    strokeWidth={1}
+                    strokeDasharray="4,4"
+                  />
+                  <text
+                    x={100}
+                    y={-5}
+                    fill="white"
+                    fontSize={10}
+                    textAnchor="middle"
+                  >
+                    No change
+                  </text>
+                </Group>
                 
                 {/* Grouped bars for renewable change */}
                 <AnimatedBarGroup>

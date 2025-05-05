@@ -1,6 +1,7 @@
 # backend/app/main.py  ← keep ONLY this block here
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import pandas as pd, os, json, pathlib
 import numpy as np
 
@@ -10,9 +11,11 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 # Set absolute paths for artefacts and forecasts directories
 ARTEFACTS = os.getenv("ARTEFACTS_DIR", os.path.join(PROJECT_ROOT, "artefacts"))
 FORECASTS = os.getenv("FORECASTS_DIR", os.path.join(PROJECT_ROOT, "forecasts"))
+INSIGHTS = os.path.join(PROJECT_ROOT, "insights")
 
 print(f"Using artefacts directory: {ARTEFACTS}")
 print(f"Using forecasts directory: {FORECASTS}")
+print(f"Using insights directory: {INSIGHTS}")
 
 # Ensure directories exist
 pathlib.Path(ARTEFACTS).mkdir(exist_ok=True)
@@ -36,6 +39,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["Content-Type", "X-Total-Count"]
+)
+
+# Mount insights directory for static file access
+app.mount(
+    "/insights",
+    StaticFiles(directory=INSIGHTS),
+    name="insights"
 )
 
 @app.get("/manifest")                # → targets & cluster list

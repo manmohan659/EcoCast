@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, createSearchParams } from 'react-router-dom';
 
 interface InsightsDrawerProps {
   isOpen: boolean;
@@ -50,6 +51,7 @@ const InsightsDrawer: React.FC<InsightsDrawerProps> = ({
   setBasket,
   className = '' 
 }) => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
@@ -140,16 +142,26 @@ const InsightsDrawer: React.FC<InsightsDrawerProps> = ({
     setBasket(basket.filter(country => country !== iso3));
   };
 
-  // Handle next button click (just show an alert for now)
+  // Handle next button click - navigate to the insight page
   const handleNextClick = () => {
     if (basket.length > 0 && selectedQuestion) {
-      console.log(`[InsightsDrawer] Next button clicked with:`, {
+      console.log(`[InsightsDrawer] Navigating to insight view with:`, {
         countries: basket,
         question: selectedQuestion
       });
       
-      // Show an alert with the selected data
-      alert(`Selected ${basket.length} countries and question: ${selectedQuestion}`);
+      // Normalize country codes to uppercase for consistency
+      const normalizedBasket = basket.map(code => code.toUpperCase());
+      console.log(`[InsightsDrawer] Normalized country codes: ${normalizedBasket.join(', ')}`);
+      
+      // Navigate to the insight page with query parameters
+      navigate({
+        pathname: "/insight",
+        search: createSearchParams({
+          question: selectedQuestion,
+          countries: normalizedBasket.join(",")
+        }).toString()
+      });
       
       // Close the drawer
       onClose();

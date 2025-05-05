@@ -54,3 +54,5 @@ __pycache__/
 .data/
 .cache/
 node_modules
+
+**/.claude/settings.local.json
