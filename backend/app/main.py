@@ -137,3 +137,45 @@ def get_ts(iso: str):
     except Exception as e:
         print(f"Error fetching timeseries data for {iso}: {str(e)}")
         return []
+
+# ═══════════════════════════════════════════════════════════
+# Random Forest Enhanced Endpoints
+# ═══════════════════════════════════════════════════════════
+
+@app.get("/co2-drivers")
+def get_co2_drivers():
+    """
+    Get top factors driving CO₂ emissions globally
+    
+    Returns: Feature importance from Random Forest trained on
+             cross-sectional data (latest year, all 193 countries)
+             
+    Use: Display as bar chart showing "What drives emissions?"
+    """
+    try:
+        drivers = _csv(f"{ARTEFACTS}/co2_drivers.csv")
+        # Return top 20 with clean names
+        top20 = drivers.head(20).copy()
+        
+        # Simplify feature names for frontend display
+        top20['display_name'] = top20['feature'].str.replace('_', ' ').str.title()
+        
+        return clean_for_json(top20).to_dict("records")
+    except FileNotFoundError:
+        raise HTTPException(404, "CO₂ drivers not generated yet. Run: python rf_co2_drivers.py")
+    except Exception as e:
+        print(f"Error loading CO₂ drivers: {str(e)}")
+        return []
+
+@app.get("/co2-drivers/metadata")
+def get_drivers_metadata():
+    """Get Random Forest model metadata (R², MAE, n_features, etc.)"""
+    try:
+        with open(f"{ARTEFACTS}/co2_drivers_metadata.json") as f:
+            return json.load(f)
+    except:
+        return {
+            "model": "RandomForestRegressor",
+            "status": "not_trained",
+            "message": "Run rf_co2_drivers.py to generate"
+        }

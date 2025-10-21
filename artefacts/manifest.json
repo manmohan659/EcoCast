@@ -138,7 +138,7 @@
     },
     {
       "iso3": "CHN",
-      "cluster_lvl2": NaN
+      "cluster_lvl2": 11.0
     },
     {
       "iso3": "CIV",
@@ -338,7 +338,7 @@
     },
     {
       "iso3": "IND",
-      "cluster_lvl2": NaN
+      "cluster_lvl2": 11.0
     },
     {
       "iso3": "IRL",
@@ -734,7 +734,7 @@
     },
     {
       "iso3": "USA",
-      "cluster_lvl2": NaN
+      "cluster_lvl2": 11.0
     },
     {
       "iso3": "UZB",
