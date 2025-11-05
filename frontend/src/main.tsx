@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import App from "./App";
 import InsightComparisonView from "./components/InsightComparisonView";
+import RFInsightsPage from "./components/RFInsightsPage";
 import "./index.css";
 
 // Configure axios to always connect to the backend
@@ -22,6 +23,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/insight" element={<InsightComparisonView />} />
+        <Route path="/rf-insights" element={<RFInsightsPage />} />
       </Routes>
     </BrowserRouter>
   </QueryClientProvider>

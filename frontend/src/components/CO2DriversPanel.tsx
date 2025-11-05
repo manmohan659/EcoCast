@@ -141,7 +141,7 @@ const CO2DriversPanel: React.FC = () => {
                 borderRadius: '0.375rem'
               }}
               labelStyle={{ color: '#fff' }}
-              formatter={(value: number) => [`${value.toFixed(2)}%`, 'Importance']}
+              formatter={(value: number) => [`${value != null ? value.toFixed(2) : '0.00'}%`, 'Importance']}
             />
             <Bar dataKey="importance_pct" radius={[0, 4, 4, 0]}>
               {drivers.map((entry, index) => (
