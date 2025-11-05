@@ -1,0 +1,13 @@
+{
+  "model": "RandomForestRegressor",
+  "n_estimators": 500,
+  "n_features": 234,
+  "n_countries": 193,
+  "r2_score": 0.8842737844087383,
+  "mae": 0.8645581066549015,
+  "top_3_drivers": [
+    "carbon_EFProdPerCap",
+    "co2_pc_lag1",
+    "carbon_EFProdPerCap_lag1"
+  ]
+}

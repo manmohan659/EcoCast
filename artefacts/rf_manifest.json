@@ -1,0 +1,45 @@
+{
+  "generated": "2025-10-17T00:36:13.032867",
+  "n_countries": 193,
+  "n_features": 234,
+  "uc1_co2_drivers": {
+    "model": "models/rf_co2_drivers.pkl",
+    "params": {
+      "n_estimators": 500,
+      "max_features": 31
+    },
+    "r2": 0.85785,
+    "top3": [
+      "carbon_EFProdPerCap",
+      "co2_pc_lag1",
+      "carbon_EFProdPerCap_lag1"
+    ]
+  },
+  "uc2_policy_sim": {
+    "model": "models/rf_co2_drivers.pkl",
+    "outputs": [
+      "artefacts/pdp_renewables.csv",
+      "artefacts/policy_simulations.csv"
+    ]
+  },
+  "uc3_trajectory": {
+    "model": "models/rf_trajectory_classifier.pkl",
+    "params": {
+      "n": 500,
+      "m": 15
+    },
+    "oob_acc": 0.74381
+  },
+  "uc4_clusters": {
+    "model": "models/rf_cluster_explainer.pkl",
+    "params": {
+      "n": 200,
+      "m": 15
+    },
+    "oob_acc": 0.88083
+  },
+  "uc5_outliers": {
+    "model": "models/isolation_forest.pkl",
+    "n_outliers": 10
+  }
+}
